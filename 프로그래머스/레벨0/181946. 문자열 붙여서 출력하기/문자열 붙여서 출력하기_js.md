@@ -16,22 +16,23 @@ const rl = readline.createInterface({
 let input = [];
 
 rl.on('line', function (line) {
-    input = line.replace(' ', '');
+    input = line.split(' ');
 }).on('close', function () {
-    console.log(input)
+    console.log(input.join(""))
+
 });
 ```
 
 ### 성능 요약
 
-1. 시간: 46.63 ms, 메모리: 32.2 MB
+1. 시간: 44.34 ms, 메모리: 32.2 MB
 
-2. 시간: 45.20 ms, 메모리: 32.2 MB
-3. 시간: 44.65 ms, 메모리: 32.2 MB
-4. 시간: 44.17 ms, 메모리: 32.2 MB
+2. 시간: 44.04 ms, 메모리: 32.3 MB
+3. 시간: 43.95 ms, 메모리: 32.2 MB
+4. 시간: 43.48 ms, 메모리: 32.2 MB
 
 ### 제출 일자
 
-2024년 10월 14일 (월) 23:07
+2024년 10월 15일 (화) 08:16
 
 > 출처: 프로그래머스 코딩 테스트 연습, https://school.programmers.co.kr/learn/challenges
