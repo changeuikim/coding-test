@@ -32,6 +32,6 @@ rl.on('line', function (line) {
 
 ### 제출 일자
 
-2024년 10월 14일 (월) 23:03
+2024년 10월 14일 (월) 23:07
 
 > 출처: 프로그래머스 코딩 테스트 연습, https://school.programmers.co.kr/learn/challenges
