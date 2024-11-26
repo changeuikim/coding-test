@@ -16,12 +16,12 @@ public class Solution {
     static class ParsedFile {
         String head;
         int number;
-        String original;
+        int index;
 
-        ParsedFile(String head, int number, String original) {
-            this.head = head;
-            this.number = number;
-            this.original = original;
+        ParsedFile(String head, String number, int index) {
+            this.head = head.toLowerCase();
+            this.number = Integer.parseInt(number);
+            this.index = index;
         }
     }
 
@@ -29,26 +29,30 @@ public class Solution {
         Pattern pattern = Pattern.compile("([a-zA-Z\\-\\. ]+)(\\d{1,5})");
         List<ParsedFile> parsedFiles = new ArrayList<>();
 
-        for (String file : files) {
-            Matcher matcher = pattern.matcher(file);
+        for (int i = 0; i < files.length; i++) {
+            Matcher matcher = pattern.matcher(files[i]);
             if (matcher.find()) {
                 String head = matcher.group(1);
-                int number = Integer.parseInt(matcher.group(2));
-                parsedFiles.add(new ParsedFile(head, number, file));
+                String number = matcher.group(2);
+                parsedFiles.add(new ParsedFile(head, number, i));
             }
         }
 
         parsedFiles.sort((f1, f2) -> {
-            int headComparison = f1.head.toLowerCase().compareTo(f2.head.toLowerCase());
+            int headComparison = f1.head.compareTo(f2.head);
             if (headComparison != 0) {
                 return headComparison;
             }
-            return Integer.compare(f1.number, f2.number);
+            int numberComparison = Integer.compare(f1.number, f2.number);
+            if (numberComparison != 0) {
+                return numberComparison;
+            }
+            return Integer.compare(f1.index, f2.index);
         });
 
-        String[] result = new String[parsedFiles.size()];
+        String[] result = new String[files.length];
         for (int i = 0; i < parsedFiles.size(); i++) {
-            result[i] = parsedFiles.get(i).original;
+            result[i] = files[parsedFiles.get(i).index];
         }
 
         return result;
@@ -58,15 +62,15 @@ public class Solution {
 
 ### 성능 요약
 
-1. 시간: 22.42 ms, 메모리: 95 MB
+1. 시간: 14.26 ms, 메모리: 74.1 MB
 
-2. 시간: 20.60 ms, 메모리: 79.1 MB
-3. 시간: 15.17 ms, 메모리: 83.8 MB
-4. 시간: 13.95 ms, 메모리: 89.8 MB
-5. 시간: 13.91 ms, 메모리: 95.8 MB
+2. 시간: 12.06 ms, 메모리: 88.3 MB
+3. 시간: 11.20 ms, 메모리: 92.8 MB
+4. 시간: 10.75 ms, 메모리: 83.9 MB
+5. 시간: 10.59 ms, 메모리: 82.8 MB
 
 ### 제출 일자
 
-2024년 11월 26일 (화) 23:57
+2024년 11월 27일 (수) 00:44
 
 > 출처: 프로그래머스 코딩 테스트 연습, https://school.programmers.co.kr/learn/challenges
