@@ -20,9 +20,13 @@ function solution(files) {
         };
     });
 
-    parsedFiles.sort((a, b) => {        
-        if (a.head !== b.head) return a.head.localeCompare(b.head);
-        if (a.number !== b.number) return a.number - b.number;
+    parsedFiles.sort((a, b) => {
+        const headComparision = a.head.localeCompare(b.head);
+        if (headComparision !== 0) return headComparision;
+        
+        const numberComparison = a.number - b.number;
+        if (numberComparison !== 0) return numberComparison;
+        
         return a.index - b.index;
     });
 
@@ -32,15 +36,15 @@ function solution(files) {
 
 ### 성능 요약
 
-1. 시간: 36.34 ms, 메모리: 38.7 MB
+1. 시간: 38.35 ms, 메모리: 38.5 MB
 
-2. 시간: 36.31 ms, 메모리: 38.8 MB
-3. 시간: 35.11 ms, 메모리: 36.1 MB
-4. 시간: 15.80 ms, 메모리: 36.7 MB
-5. 시간: 15.76 ms, 메모리: 36.6 MB
+2. 시간: 34.54 ms, 메모리: 35.9 MB
+3. 시간: 28.50 ms, 메모리: 38.6 MB
+4. 시간: 13.02 ms, 메모리: 38.6 MB
+5. 시간: 12.48 ms, 메모리: 38.5 MB
 
 ### 제출 일자
 
-2024년 11월 27일 (수) 00:39
+2024년 11월 27일 (수) 00:44
 
 > 출처: 프로그래머스 코딩 테스트 연습, https://school.programmers.co.kr/learn/challenges
