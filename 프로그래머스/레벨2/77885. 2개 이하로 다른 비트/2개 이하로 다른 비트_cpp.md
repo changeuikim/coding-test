@@ -15,15 +15,14 @@ vector<long long> solution(vector<long long> numbers) {
     vector<long long> result;
 
     for (long long num : numbers) {
-        if (num % 2 == 0) {
-            result.push_back(num + 1);
-        } else {
-            long long bit = 1;
-            while (num & bit) {
-                bit <<= 1;
-            }
-            result.push_back(num + bit - (bit >> 1));
-        }
+        // 첫번째 0은 1로, 뒤는 모두 0
+        long long biggerNum = num + 1;
+        // 첫번째 0 이전은 0, 뒤는 모두 1
+        long long bitDiff = num ^ (num + 1);
+        // 우측 시프트 시에 첫번째 01을 10으로 바꾸는 효과
+        long long minNum = biggerNum + (bitDiff >> 2);
+
+        result.push_back(minNum);
     }
 
     return result;
@@ -32,15 +31,15 @@ vector<long long> solution(vector<long long> numbers) {
 
 ### 성능 요약
 
-1. 시간: 51.86 ms, 메모리: 27.8 MB
+1. 시간: 30.17 ms, 메모리: 27.8 MB
 
-2. 시간: 42.05 ms, 메모리: 27.8 MB
-3. 시간: 41.48 ms, 메모리: 25 MB
-4. 시간: 36.84 ms, 메모리: 27.8 MB
-5. 시간: 31.48 ms, 메모리: 24.1 MB
+2. 시간: 29.32 ms, 메모리: 27.8 MB
+3. 시간: 29.01 ms, 메모리: 27.9 MB
+4. 시간: 27.80 ms, 메모리: 25.8 MB
+5. 시간: 25.98 ms, 메모리: 25 MB
 
 ### 제출 일자
 
-2024년 12월 02일 (월) 00:00
+2024년 12월 02일 (월) 00:39
 
 > 출처: 프로그래머스 코딩 테스트 연습, https://school.programmers.co.kr/learn/challenges
