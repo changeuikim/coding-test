@@ -15,8 +15,10 @@ function solution(numbers) {
         
         // 첫번째 0은 1로, 뒤는 모두 0
         const biggerNum = bigNum + 1n;
+        
         // 첫번째 0 이전은 0, 뒤는 모두 1
         const bitDiff = bigNum ^ (bigNum + 1n);
+        
         // 우측 시프트 시에 첫번째 01을 10으로 바꾸는 효과
         const minNum = biggerNum + (bitDiff >> 2n);
 
@@ -29,15 +31,15 @@ function solution(numbers) {
 
 ### 성능 요약
 
-1. 시간: 38.81 ms, 메모리: 56.1 MB
+1. 시간: 34.94 ms, 메모리: 57.1 MB
 
-2. 시간: 34.51 ms, 메모리: 57.7 MB
-3. 시간: 33.61 ms, 메모리: 56.6 MB
-4. 시간: 30.82 ms, 메모리: 56.2 MB
-5. 시간: 30.30 ms, 메모리: 50.6 MB
+2. 시간: 34.46 ms, 메모리: 50.5 MB
+3. 시간: 31.34 ms, 메모리: 57.4 MB
+4. 시간: 30.41 ms, 메모리: 56 MB
+5. 시간: 27.03 ms, 메모리: 56 MB
 
 ### 제출 일자
 
-2024년 12월 02일 (월) 00:37
+2024년 12월 02일 (월) 19:38
 
 > 출처: 프로그래머스 코딩 테스트 연습, https://school.programmers.co.kr/learn/challenges
