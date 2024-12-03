@@ -16,7 +16,7 @@ console.log('Hello World!');
 
 ### 제출 일자
 
-2024년 12월 03일 (화) 23:26
+2024년 12월 03일 (화) 23:28
 
 > 출처: 백준 온라인 저지, https://www.acmicpc.net/problemset 
 
