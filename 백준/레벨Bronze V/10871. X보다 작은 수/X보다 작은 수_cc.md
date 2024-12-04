@@ -33,7 +33,7 @@ int main(void) {
 
 ### 제출 일자
 
-2024년 12월 02일 (월) 22:40
+2024년 12월 05일 (목) 08:57
 
 > 출처: 백준 온라인 저지, https://www.acmicpc.net/problemset 
 
