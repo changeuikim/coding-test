@@ -12,24 +12,24 @@ public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        
+
         int A = Integer.parseInt(st.nextToken());
         int B = Integer.parseInt(st.nextToken());
-        
-        System.out.println(A + B);
+
+        System.out.println(A+B);
     }
 }
 ```
 
 ### 성능 요약
 
-시간: 104 ms
+시간: 100 ms
 
-메모리: 14216 KB
+메모리: 14172 KB
 
 ### 제출 일자
 
-2024년 12월 02일 (월) 22:51
+2024년 12월 05일 (목) 10:49
 
 > 출처: 백준 온라인 저지, https://www.acmicpc.net/problemset 
 
