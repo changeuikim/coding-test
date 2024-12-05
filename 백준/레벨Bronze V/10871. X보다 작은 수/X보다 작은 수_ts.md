@@ -7,17 +7,13 @@ NaN구현
 ```TypeScript
 import fs = require('fs');
 
-const input: string = fs.readFileSync('/dev/stdin').toString().trim();
-
-// 입력 처리
+const input: string = fs.readFileSync(0, 'utf-8').trim();
 const lines: string[] = input.split('\n');
+
 const [N, X]: number[] = lines[0].split(' ').map(Number);
 const A: number[] = lines[1].split(' ').map(Number);
 
-// 결과 처리
-const result: number[] = A.filter(a => a < X);
-
-// 출력 처리
+const result: number[] = A.filter((a) => a < X);
 console.log(result.join(' '));
 ```
 
@@ -25,11 +21,11 @@ console.log(result.join(' '));
 
 시간: 100 ms
 
-메모리: 11060 KB
+메모리: 11052 KB
 
 ### 제출 일자
 
-2024년 12월 02일 (월) 22:06
+2024년 12월 05일 (목) 10:14
 
 > 출처: 백준 온라인 저지, https://www.acmicpc.net/problemset 
 
