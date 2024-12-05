@@ -1,5 +1,3 @@
-from sys import stdin
+A, B = map(int, input().rstrip().split())
 
-a, b = map(int, stdin.read().split())
-
-print(a + b)
+print(A + B)
