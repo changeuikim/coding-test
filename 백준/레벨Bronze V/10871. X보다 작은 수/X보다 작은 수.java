@@ -6,20 +6,18 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
         
-        // 입력 처리        
         int N = Integer.parseInt(st.nextToken());
         int X = Integer.parseInt(st.nextToken());
         
+        StringBuilder result = new StringBuilder();
         st = new StringTokenizer(br.readLine());
-        StringBuilder sb = new StringBuilder();
         
-        // 결과 처리
-        for (int i = 0; i < N; i++) {
-            int value = Integer.parseInt(st.nextToken());
-            if (value < X) sb.append(value).append(" ");
+        // 배열 A
+        while (N-- > 0) {
+            int a = Integer.parseInt(st.nextToken());
+            if (a < X) result.append(a).append(" ");
         }
-            
-        // 출력 처리
-        System.out.println(sb.toString().trim());
+
+        System.out.println(result.toString());
     }
 }
