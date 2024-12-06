@@ -9,27 +9,17 @@
 ```py
 class Solution:
     def isPalindrome(self, s: str) -> bool:
-        start, end = 0, len(s) - 1
-        while start <= end:
-            if not s[start].isalnum():
-                start += 1
-            elif not s[end].isalnum():
-                end -= 1
-            else:
-                if s[start].lower() != s[end].lower():
-                    return False
-                start += 1
-                end -= 1
-        return True
+        s = re.sub('[^a-z0-9]', '', s.lower())
+        return s == s[::-1]
 ```
 
 ### 성능 요약
 
 - 실행 시간: 7 ms (81.48%)
-- 메모리 사용량: 17.7 MB (33.08%)
+- 메모리 사용량: 18.8 MB (17.37%)
 
 ### 제출 일자
 
-2024년 12월 06일 (금) 15:09
+2024년 12월 06일 (금) 15:12
 
 > 출처: LeetCode, https://leetcode.com/problemset
