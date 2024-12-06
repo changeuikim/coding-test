@@ -20,6 +20,6 @@ class Solution:
 
 ### 제출 일자
 
-2024년 12월 06일 (금) 15:12
+2024년 12월 06일 (금) 15:15
 
 > 출처: LeetCode, https://leetcode.com/problemset
