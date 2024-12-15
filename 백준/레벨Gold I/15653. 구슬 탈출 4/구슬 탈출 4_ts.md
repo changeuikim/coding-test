@@ -8,139 +8,140 @@ NaN너비 우선 탐색, 그래프 이론, 그래프 탐색, 구현, 시뮬레�
 // @ts-ignore
 import fs = require('fs');
 
-// 입력 처리
 const lines = fs.readFileSync(0, 'utf-8').trim().split('\n');
-let idx = 0;
-const input = (): string => lines[idx++];
+let index = 0;
+const input = (): string => lines[index++];
 
 type Pos = [number, number];
+type State = [Pos, Pos, number];
 
-interface State {
-  red: Pos;
-  blue: Pos;
-  moves: number;
+class Queue<T> {
+  private input: T[] = [];
+  private output: T[] = [];
+
+  push(item: T): void {
+    this.input.push(item);
+  }
+
+  pop(): T | undefined {
+    if (this.output.length === 0) {
+      while (this.input.length > 0) {
+        this.output.push(this.input.pop()!);
+      }
+    }
+    return this.output.pop();
+  }
+
+  size(): number {
+    return this.input.length + this.output.length;
+  }
+
+  isEmpty(): boolean {
+    return this.size() === 0;
+  }
 }
 
-const initBoard = (): { red: Pos; blue: Pos; board: string[][] } => {
+const BFS = (): number => {
+  // 보드, 빨강, 파랑 초기화
   const [N, M] = input().split(' ').map(Number);
   const board: string[][] = [];
-  let red: Pos;
-  let blue: Pos;
+  let red: Pos, blue: Pos;
 
   for (let i = 0; i < N; i++) {
-    const line = input().split('');
+    const row = input().split('');
 
     for (let j = 0; j < M; j++) {
-      if (line[j] === 'R') {
+      if (row[j] === 'R') {
         red = [i, j];
-        line[j] = '.';
-      } else if (line[j] === 'B') {
+        row[j] = '.';
+      } else if (row[j] === 'B') {
         blue = [i, j];
-        line[j] = '.';
+        row[j] = '.';
       }
     }
 
-    board.push(line);
+    board.push(row);
   }
 
-  return { red, blue, board };
-};
+  // 방향 : 좌우상하
+  const dy = [0, 0, -1, 1];
+  const dx = [-1, 1, 0, 0];
 
-const move = (
-  y: number,
-  x: number,
-  dy: number,
-  dx: number,
-  board: string[][]
-): [number, number, number] => {
-  let count = 0;
-  while (board[y + dy][x + dx] !== '#' && board[y][x] !== 'O') {
-    y += dy;
-    x += dx;
-    count++;
-  }
-  return [y, x, count];
-};
+  // 큐, 방문 초기화
+  const q = new Queue<State>();
+  const visited = new Set<string>();
 
-const solution = (): number => {
-  // 미로 초기화
-  const { red, blue, board } = initBoard();
+  q.push([red, blue, 1]);
+  visited.add(JSON.stringify([red, blue]));
 
-  // 방향 초기화 : 좌우상하
-  const dirs = [
-    [0, 1],
-    [0, -1],
-    [-1, 0],
-    [1, 0],
-  ];
-
-  // 큐 초기화
-  let f_stk: State[] = [];
-  let r_stk: State[] = [];
-  const visited: Set<string> = new Set();
-
-  f_stk.push({ red, blue, moves: 1 });
-  visited.add(JSON.stringify({ red, blue }));
+  // 굴리기
+  const roll = (y: number, x: number, dy: number, dx: number): [number, number, number] => {
+    let count = 0;
+    // 벽에 부딪치기 전까지, 구멍에 빠질때까지
+    while (board[y + dy][x + dx] !== '#' && board[y][x] !== 'O') {
+      y += dy;
+      x += dx;
+      count += 1;
+    }
+    return [y, x, count];
+  };
 
   // BFS
-  while (f_stk.length > 0 || r_stk.length > 0) {
-    const {
-      red: [ry, rx],
-      blue: [by, bx],
-      moves,
-    } = f_stk.pop();
+  while (!q.isEmpty()) {
+    const [[ry, rx], [by, bx], move] = q.pop();
 
-    for (const [dy, dx] of dirs) {
-      let [nBy, nBx, bCnt] = move(by, bx, dy, dx, board);
-      let [nRy, nRx, rCnt] = move(ry, rx, dy, dx, board);
+    // 좌우상하 굴리기
+    for (let i = 0; i < 4; i++) {
+      let [nry, nrx, rCount] = roll(ry, rx, dy[i], dx[i]);
+      let [nby, nbx, bCount] = roll(by, bx, dy[i], dx[i]);
 
-      // 파란구슬 실패
-      if (board[nBy][nBx] === 'O') continue;
+      // 빨간 구슬과 파란 구슬이 동시에 구멍에 빠져도 실패
+      if (board[nby][nbx] == 'O') continue;
 
-      // 빨간구슬 성공
-      if (board[nRy][nRx] === 'O') return moves;
+      // 빨간 구슬이 구멍에 빠지면 성공
+      if (board[nry][nrx] == 'O') return move;
 
-      // 위치가 겹치면 더 많이 움직인걸 뒤로
-      if (nRy === nBy && nRx === nBx) {
-        if (rCnt > bCnt) {
-          nRy -= dy;
-          nRx -= dx;
-        } else {
-          nBy -= dy;
-          nBx -= dx;
+      // 빨간 구슬과 파란 구슬은 동시에 같은 칸에 있을 수 없다
+      if (nry === nby && nrx === nbx) {
+        // 빨간 구슬을 뒤로
+        if (rCount > bCount) {
+          nry -= dy[i];
+          nrx -= dx[i];
+        }
+        // 파란 구슬을 뒤로
+        else {
+          nby -= dy[i];
+          nbx -= dx[i];
         }
       }
 
       // 큐에 추가
-      const stateStr = JSON.stringify({ red: [nRy, nRx], blue: [nBy, nBx] });
-      if (!visited.has(stateStr)) {
-        r_stk.push({ red: [nRy, nRx], blue: [nBy, nBx], moves: moves + 1 });
-        visited.add(stateStr);
-      }
-    }
+      const nxtRed: Pos = [nry, nrx];
+      const nxtBlue: Pos = [nby, nbx];
+      const hashKey = JSON.stringify([nxtRed, nxtBlue]);
 
-    // 스택 교환
-    if (f_stk.length === 0) {
-      f_stk = r_stk;
-      r_stk = [];
+      if (visited.has(hashKey)) continue;
+
+      q.push([nxtRed, nxtBlue, move + 1]);
+      visited.add(hashKey);
     }
   }
 
   return -1;
 };
 
-console.log(solution());
+console.log(BFS());
 ```
 
 ### 성능 요약
 
-시간: 112 ms
+시간: 108 ms
 
-메모리: 10112 KB
+메모리: 10128 KB
 
 ### 제출 일자
 
-2024년 12월 15일 (일) 00:25
+2024년 12월 15일 (일) 17:22
 
 > 출처: 백준 온라인 저지, https://www.acmicpc.net/problemset 
 
