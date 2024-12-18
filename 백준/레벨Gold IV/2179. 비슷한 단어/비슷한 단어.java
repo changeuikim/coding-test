@@ -1,66 +1,70 @@
+/*
+    골드4 - 2179번: 비슷한 단어  https://www.acmicpc.net/problem/2179
+ */
+
 import java.io.*;
 import java.util.*;
 
-class Solution {
-    class Word {
-        String text;
-        int index;
+class Word {
+    String text;
+    int index;
     
-        Word(String text, int index) {
-            this.text = text;
-            this.index = index;
-        }
+    Word(String text, int index) {
+        this.text = text;
+        this.index = index;
+    }
+}
+
+class LCP {
+    String text;
+    int index;
+
+    LCP(String text, int index) {
+        this.text = text;
+        this.index = index;
     }
 
-    class Pair {
-        final int index;
-        final String lcp;
-
-        Pair(int index, String lcp) {
-            this.index = index;
-            this.lcp = lcp;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) return true;
-            if (obj == null || getClass() != obj.getClass()) return false;
-            Pair other = (Pair) obj;
-            return index == other.index && Objects.equals(lcp, other.lcp);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(index, lcp);
-        }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || this.getClass() != o.getClass()) return false;
+        LCP lcp = (LCP) o;
+        return Objects.equals(this.text, lcp.text) &&
+               this.index == lcp.index;
     }
 
-    public void solution() throws IOException {
-        String[] read = new String(System.in.readAllBytes()).split("\n"); 
+    @Override
+    public int hashCode() {
+        return Objects.hash(text, index);
+    }
+}
 
+class Solution {
+    public void solution() throws IOException  {
+        String[] read = new String(System.in.readAllBytes()).split("\n");
         int N = Integer.parseInt(read[0].trim());
 
-        // 사전 순 정렬
-        List<Word> words = new ArrayList<>(N);
+        // 사전순 정렬된 wordList를 생성
+        List<Word> wordList = new ArrayList<>(N);
         for (int i = 1; i < read.length; i++) {
-            words.add(new Word(read[i].trim(), i));
+            wordList.add(new Word(read[i].trim(), i));
         }
-        words.sort(Comparator.comparing(w -> w.text));
+        wordList.sort(Comparator.comparing(w -> w.text));
 
-        // 인접 글자 간 LCP 처리
+        // 인접 단어 사이의 LCP 중 가장 긴 것을 추출
         int maxLen = 0;
-        Set<Pair> result = new HashSet<>();
+        Set<LCP> lcpSet = new HashSet<>();
 
-        for (int i = 0; i < words.size() - 1; i++) {
-            String pre = words.get(i).text;
-            int preIdx = words.get(i).index;
+        for (int i = 0; i < wordList.size() - 1; i++) {
+            String pre = wordList.get(i).text;
+            int pIdx = wordList.get(i).index;
 
-            String nxt = words.get(i + 1).text;
-            int nxtIdx = words.get(i + 1).index;
+            String nxt = wordList.get(i + 1).text;
+            int nIdx = wordList.get(i + 1).index;
 
-            int size = Math.min(pre.length(), nxt.length());
+            // LCP의 길이 확인
             int curLen = 0;
-
+            int size = Math.min(pre.length(), nxt.length());
             for (int j = 0; j < size; j++) {
                 if (pre.charAt(j) == nxt.charAt(j)) {
                     curLen++;
@@ -69,31 +73,34 @@ class Solution {
                 }
             }
 
-            // LCP 갱신
+            // 최대 길이가 갱신되면 SET 교체
             if (maxLen < curLen) {
-                String lcp = pre.substring(0, curLen);
                 maxLen = curLen;
-                result.clear();
-                result.add(new Pair(preIdx, lcp));
-                result.add(new Pair(nxtIdx, lcp));
-            } else if (maxLen == curLen) {
-                String lcp = pre.substring(0, curLen);
-                result.add(new Pair(preIdx, lcp));
-                result.add(new Pair(nxtIdx, lcp));
+                String text = pre.substring(0, curLen);
+                lcpSet.clear();
+                lcpSet.add(new LCP(text, pIdx));
+                lcpSet.add(new LCP(text, nIdx));
+            }
+            // 최대 길이가 동일하면 SET에 추가
+            else if (maxLen == curLen) {
+                String text = pre.substring(0, curLen);
+                lcpSet.add(new LCP(text, pIdx));
+                lcpSet.add(new LCP(text, nIdx));
             }
         }
 
-        // 여러 개일 때에는 입력되는 순서대로
-        List<Pair> idxList = new ArrayList<>(result);
-        idxList.sort(Comparator.comparingInt(a -> a.index));
-
-        int idx1 = idxList.get(0).index;
-        String common = idxList.get(0).lcp;
+        // Set -> List, 입력 순 정렬
+        List<LCP> lcpList = new ArrayList<>(lcpSet);
+        lcpList.sort(Comparator.comparingInt(l -> l.index));
+        
+        String lcp = lcpList.get(0).text;
+        int idx1 = lcpList.get(0).index;
 
         int idx2 = -1;
-        for (int i = 1; i < idxList.size(); i++) {
-            if (idxList.get(i).lcp.equals(common)) {
-                idx2 = idxList.get(i).index;
+        for (int i = 1; i < lcpList.size(); i++) {
+            String cur = lcpList.get(i).text;
+            if (cur.equals(lcp)) {
+                idx2 = lcpList.get(i).index;
                 break;
             }
         }
@@ -104,7 +111,7 @@ class Solution {
 }
 
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException  {
         new Solution().solution();
     }
 }
