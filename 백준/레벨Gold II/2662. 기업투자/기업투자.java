@@ -1,63 +1,73 @@
+/*
+    골드2 - 2662번: 기업투자 https://www.acmicpc.net/problem/2662
+ */
+
 import java.io.*;
-import java.util.*;
 
-public class Main {
-    static int nextInt() throws IOException {
-        int n = 0;
-        int c;
-        while((c = System.in.read()) <= 32); // 탭 9, 개행 10, 공백 32
-        do {
-            n = n * 10 + (c - '0'); // 현재 자리를 추가
-        } while ((c = System.in.read()) > 32); // 구분자 전까지
-        return n;
-    }
-
-    public static void main(String[] args) throws IOException {
-
-        // 이익 2차원 배열 : n축 금액, m축 기업
+class Solution {
+    public void dynamic() throws IOException  {
         int N = nextInt(), M = nextInt();
-        int[][] profit = new int[N+1][M+1];
 
+        // 1. 2차원 : 투자 x 이익, 1-based
+        int[][] profit = new int[N + 1][M + 1];
         for (int i = 1; i <= N; i++) {
             for (int j = 0; j <= M; j++) {
                 profit[i][j] = nextInt();
             }
         }
 
-        // 누산 DP, 기업별 memo
-        int[][] dp = new int[N+1][M+1];
-        int[][] memo = new int[N+1][M+1];
+        // 2. 다이나믹 프로그래밍밍
+        // DP[N][M] : 총 투자 N원으로 M번째 기업까지의 최대 이익
+        // memo[N][M] : 총 투자 N원으로 M 기업이 받은 투자액
+        int[][] dp = new int[N + 1][M + 1];
+        int[][] memo = new int[N + 1][M + 1];
 
-        // 루프 : 기업 -> 투자액 -> 변동폭
-        // 점화식 : dp[N][다음] = dp[N-k][이전] + profit[k][다음]
-        for (int i = 1; i <= M; i++) {
-            for (int j = 0; j <= N; j++) {
-                for (int k = 0; k <= j; k++) {
-                    int curProfit = dp[j - k][i - 1] + profit[k][i];
-                    if (curProfit > dp[j][i]) {
-                        dp[j][i] = curProfit;
-                        memo[j][i] = k;
+        // 루프 : 기업j -> 투자i -> 변동k
+        // 점화식 : dp[N][다음 기업] = dp[N-k][이전 기업] + profit[k][다음 기업]
+        for (int j = 1; j <= M; j++) {
+            for (int i = 0; i <= N; i++) {
+                for (int k = 0; k <= i; k++) {
+                    int nxt = dp[i - k][j - 1] + profit[k][j];
+                    if (dp[i][j] < nxt) {
+                        dp[i][j] = nxt;
+                        memo[i][j] = k;
                     }
                 }
             }
         }
-
+        // 투자 N으로 기업 M까지의 최대 이익
         System.out.println(dp[N][M]);
 
-        // memo[N][M]부터 N을 차감하며 역추적
-        int[] corp = new int[M+1];
-        int r = N;
-        
-        for (int i = M; i >= 1; i--) {
-            corp[i] = memo[r][i];
-            r -= memo[r][i];     
-        }
-        
-        StringBuilder sb = new StringBuilder();
-        for (int i = 1; i < corp.length; i++) {
-            sb.append(corp[i]).append(" ");
+        // 3. 기업별 투자액 역추적
+        int[] trace = new int[M + 1];
+        int invest = N;
+
+        for (int corp = M; corp > 0; corp--) {
+            trace[corp] = memo[invest][corp];
+            invest -= trace[corp];
         }
 
+        StringBuilder sb = new StringBuilder();
+        for (int i = 1; i <= M; i++) {
+            sb.append(trace[i]).append(" ");
+        }
+        
         System.out.println(sb);
+    }
+
+    private static int nextInt() throws IOException {
+        int n = 0;
+        int c;
+        while ((c = System.in.read()) <= 32);
+        do {
+            n = n * 10 + (c - '0');
+        } while ((c = System.in.read()) > 32);
+        return n;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) throws IOException  {
+        new Solution().dynamic();
     }
 }
