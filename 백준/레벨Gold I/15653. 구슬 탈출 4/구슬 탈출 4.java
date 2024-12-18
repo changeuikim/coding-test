@@ -1,163 +1,183 @@
+/*
+    골드1 - 15653번: 구슬 탈출 4  https://www.acmicpc.net/problem/15653
+ */
+
 import java.io.*;
 import java.util.*;
 
-class Pos {
+class Orb {
     int y, x, count;
-    
-    Pos(int y, int x) {
+
+    Orb(int y, int x) {
         this.y = y;
         this.x = x;
     }
 
-    Pos(int y, int x, int count) {
+    Orb(int y, int x, int count) {
         this.y = y;
         this.x = x;
         this.count = count;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || this.getClass() != o.getClass()) return false;
+        Orb orb = (Orb) o;
+        return this.y == orb.y &&
+               this.x == orb.x;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(y, x);
+    }
 }
 
 class State {
-    Pos red, blue;
+    Orb red, blue;
     int move;
 
-    State(Pos red, Pos blue, int move) {
+    State(Orb red, Orb blue, int move) {
         this.red = red;
         this.blue = blue;
         this.move = move;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || this.getClass() != obj.getClass()) return false;
-        State state = (State) obj;
-        return this.red.y == state.red.y &&
-               this.red.x == state.red.x &&
-               this.blue.y == state.blue.y &&
-               this.blue.x == state.blue.x;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || this.getClass() != o.getClass()) return false;
+        State state = (State) o;
+        return this.red.equals(state.red) &&
+               this.blue.equals(state.blue);
     }
-    
+
     @Override
     public int hashCode() {
-        return Objects.hash(red.y, red.x, blue.y, blue.x);
+        return Objects.hash(red, blue);
     }
 }
 
-class BFS {
-    private Pos roll(int y, int x, int dy, int dx, char[][] board) {
-        int count = 0;
-        // 벽에 부딪치기 전까지, 구멍에 빠질때까지
-        while (board[y + dy][x + dx] != '#' && board[y][x] != 'O') {
-            y += dy;
-            x += dx;
-            count += 1;
-        }
-        return new Pos(y, x, count);
-    }
+class Solution {
+    private static char[][] board;
 
-    public int solution() throws IOException {
-        // 보드, 빨강, 파랑 초기화
+    public void bfs() throws IOException  {
         int N = nextInt(), M = nextInt();
-        char[][] board = new char[N][M];
-        Pos red = null, blue = null;
+
+        // 2차원 보드, 빨강, 파랑 초기화
+        board = new char[N][M];
+        Orb red = null, blue = null;
 
         for (int i = 0; i < N; i++) {
-            char[] row = nextLine().toCharArray();
+            char[] line = nextLine().toCharArray();
 
             for (int j = 0; j < M; j++) {
-                if (row[j] == 'R') {
-                    red = new Pos(i, j);
-                    row[j] = '.';
-                } else if (row[j] == 'B') {
-                    blue = new Pos(i, j);
-                    row[j] = '.';
+                if (line[j] == 'R') {
+                    red = new Orb(i, j);
+                    line[j] = '.';
+                }
+                else if (line[j] == 'B') {
+                    blue = new Orb(i, j);
+                    line[j] = '.';
                 }
             }
 
-            board[i] = row;
+            board[i] = line;
         }
 
-        // 방향 : 좌우상하
-        int[] dy = { 0, 0, -1, 1};
-        int[] dx = { -1, 1, 0, 0};
+        // 방향 설정 : 좌우상하
+        int[] dy = {0, 0, 1, -1};
+        int[] dx = {-1, 1, 0, 0};
 
-        // 큐, 방문 초기화
+        // 큐 초기화
         Queue<State> q = new LinkedList<>();
         Set<State> visited = new HashSet<>();
 
-        State inits = new State(red, blue, 1);
-        q.offer(inits);
-        visited.add(inits);
+        State start = new State(red, blue, 0);
+        q.offer(start);
+        visited.add(start);
 
         // BFS
         while (!q.isEmpty()) {
-            State curState = q.poll();
+            State cur = q.poll();
 
-            Pos cr = curState.red;
-            Pos cb = curState.blue;
-            int move = curState.move;
-        
-            // 좌우상하 굴리기
+            Orb cr = cur.red;
+            Orb cb = cur.blue;
+            int move = cur.move;
+
+            // 방향전환
             for (int i = 0; i < 4; i++) {
-                Pos nr = roll(cr.y, cr.x, dy[i], dx[i], board);
-                Pos nb = roll(cb.y, cb.x, dy[i], dx[i], board);
-        
-                // 빨간 구슬과 파란 구슬이 동시에 구멍에 빠져도 실패
+                Orb nr = roll(cr.y, cr.x, dy[i], dx[i]);
+                Orb nb = roll(cb.y, cb.x, dy[i], dx[i]);
+
+                // 파란 구슬이 구멍에 들어가면 안 된다
                 if (board[nb.y][nb.x] == 'O') continue;
-        
-                // 빨간 구슬이 구멍에 빠지면 성공
-                if (board[nr.y][nr.x] == 'O') return move;
-        
-                // 빨간 구슬과 파란 구슬은 동시에 같은 칸에 있을 수 없다
+
+                // 게임의 목표는 빨간 구슬
+                if (board[nr.y][nr.x] == 'O') {
+                    System.out.println(move + 1);
+                    return;
+                }
+                // 동시에 같은 칸에 있을 수 없다
                 if (nr.y == nb.y && nr.x == nb.x) {
-                // 빨간 구슬을 뒤로
-                if (nr.count > nb.count) {
-                    nr.y -= dy[i];
-                    nr.x -= dx[i];
+                    // 더 많이 움직인 것을 뒤로
+                    if (nr.count > nb.count) {
+                        nr.y -= dy[i];
+                        nr.x -= dx[i];
+                    }
+                    else {
+                        nb.y -= dy[i];
+                        nb.x -= dx[i];
+                    }
                 }
-                // 파란 구슬을 뒤로
-                else {
-                    nb.y -= dy[i];
-                    nb.x -= dx[i];
-                }
-                }
-        
+
                 // 큐에 추가
-                State nxtState = new State(nr, nb, move + 1);
-                if (visited.contains(nxtState)) continue;
-        
-                q.offer(nxtState);
-                visited.add(nxtState);
+                State nxt = new State(nr, nb, move + 1);
+                if (visited.contains(nxt)) continue;
+
+                q.offer(nxt);
+                visited.add(nxt);
             }
-          }
-        
-        return -1;
+        }
+
+        System.out.println(-1);
     }
 
-    int nextInt() throws IOException {
+    private static Orb roll(int y, int x, int dy, int dx) {
+        int count = 0;
+        // 다음이 벽이 아니고, 지금이 구멍이 아니라면
+        while (board[y + dy][x + dx] != '#' && board[y][x] != 'O') {
+            y += dy;
+            x += dx;
+            count++;
+        }
+        return new Orb(y, x, count);
+    }
+
+    private static int nextInt() throws IOException {
         int n = 0;
         int c;
-        while ((c = System.in.read()) <= 32); // 탭 9, 개행 10, 공백 32
+        while ((c = System.in.read()) <= 32);
         do {
-            n = n * 10 + (c - '0'); // 한자리씩 추가
-        } while ((c = System.in.read()) > 32); // 구분자 전까지
+            n = n * 10 + (c - '0');
+        } while ((c = System.in.read()) > 32);
         return n;
     }
 
-    String nextLine() throws IOException {
+    private static String nextLine() throws IOException {
         char[] buf = new char[10];
-        int idx = 0;
-        int c;
-        while ((c = System.in.read()) <= 32); // 탭 9, 개행 10, 공백 32
+        int c, idx = 0;
+        while ((c = System.in.read()) <= 32);
         do {
-            buf[idx++] = (char)c; // 한글자씩 추가
-        } while ((c = System.in.read()) > 10); // 개행 전까지지
+            buf[idx++] = (char)c;
+        } while((c = System.in.read()) > 10);
         return new String(buf, 0, idx);
     }
 }
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-        System.out.println(new BFS().solution());
+    public static void main(String[] args) throws IOException  {
+        new Solution().bfs();
     }
 }
