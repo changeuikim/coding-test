@@ -1,37 +1,12 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-vector<vector<int>> fGraph, rGraph;
-vector<bool> visited;
-stack<int> orderStack;
-
-void fDFS(int u) {
-    visited[u] = true;
-    for (int v : fGraph[u]) {
-        if (!visited[v]) {
-            fDFS(v);
-        }
-    }
-    orderStack.push(u);
-}
-
-void rDFS(int v, vector<int>& curSCC) {
-    visited[v] = true;
-    curSCC.push_back(v);
-    for (int u : rGraph[v]) {
-        if (!visited[u]) {
-            rDFS(u, curSCC);
-        }
-    }
-}
-
 void solution() {
     // 정방향, 역방향 인접리스트 초기화
     int V, E;
     cin >> V >> E;
 
-    fGraph.resize(V + 1);
-    rGraph.resize(V + 1);
+    vector<vector<int>> fGraph(V + 1), rGraph(V + 1);
 
     for (int i = 0; i < E; i++) {
         int u, v;
@@ -41,31 +16,58 @@ void solution() {
     }
 
     // 모든 정점에 대해 정방향 DFS
-    visited.resize(V + 1, false);
+    vector<bool> visited(V + 1, false);
+    vector<int> orderStack;
+    stack<pair<int, int>> fDFS;
 
-    for (int u = 1; u <= V; u++) {
-        if (!visited[u]) {
-            fDFS(u);
+    for (int i = 1; i <= V; i++) {
+        fDFS.push({i, -1});
+    }
+
+    while (!fDFS.empty()) {
+        auto [u, state] = fDFS.top();
+        fDFS.pop();
+        if (state > -1) {
+            orderStack.push_back(u);
+            continue;
+        }
+        if (visited[u]) continue;
+
+        visited[u] = true;
+        fDFS.push({u, 0});
+        for (int v : fGraph[u]) {
+            if (!visited[v]) fDFS.push({v, -1});
         }
     }
 
     // 방문 정점에 대해 역방향 DFS
     visited.assign(V + 1, false);
     vector<vector<int>> sccList;
+    stack<int> rDFS;
 
-    while (!orderStack.empty()) {
-        int v = orderStack.top();
-        orderStack.pop();
-        if (!visited[v]) {
-            vector<int> curSCC;
-            rDFS(v, curSCC);
-            sort(curSCC.begin(), curSCC.end());
-            sccList.push_back(curSCC);
+    for (int i = orderStack.size() - 1; i >= 0; i--) {
+        int start = orderStack[i];
+        if (visited[start]) continue;
+
+        rDFS.push(start);
+        vector<int> curSCC;
+        while (!rDFS.empty()) {
+            int v = rDFS.top();
+            rDFS.pop();
+            if (visited[v]) continue;
+
+            visited[v] = true;
+            curSCC.push_back(v);
+            for (int u : rGraph[v]) {
+                if (!visited[u]) rDFS.push(u);
+            }
         }
+        sort(curSCC.begin(), curSCC.end());
+        sccList.push_back(curSCC);
     }
 
-    // 첫줄에 SCC의 개수 출력
-    // 각 줄에 SCC의 정점 번호 출력
+    // 첫줄에 SCC의 개수 K를 출력
+    // 다음 K개의 줄에는 각 줄에 하나의 SCC에 속한 정점의 번호를 출력
     sort(sccList.begin(), sccList.end(), [](const vector<int>& a, const vector<int>& b) {
         return a[0] < b[0];
     });
